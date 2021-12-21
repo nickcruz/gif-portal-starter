@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import twitterLogo from "./assets/twitter-logo.svg";
 import "./App.css";
 
 // Constants
-const TWITTER_HANDLE = "_buildspace";
+const TWITTER_HANDLE = "nick___cruz";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const checkIfPhantomInstalled = () => {
@@ -23,32 +23,54 @@ const checkIfPhantomInstalled = () => {
 
 const connectToPhantom = async () => {
   const { solana } = window;
-  const resp = await solana.connect();
-  console.log(
-    "connected to Phantom wallet, public key:",
-    resp.publicKey.toString()
-  );
+  try {
+    const resp = await solana.connect({ onlyIfTrusted: true });
+    console.log(
+      "connected to Phantom wallet, public key:",
+      resp.publicKey.toString()
+    );
+    return resp.publicKey.toString();
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
 };
 
 const App = () => {
+  const [publicKey, setPublicKey] = useState(undefined);
+
   useEffect(() => {
     const onLoad = async () => {
       if (checkIfPhantomInstalled()) {
-        connectToPhantom();
+        const connectedPublicKey = await connectToPhantom();
+        setPublicKey(connectedPublicKey);
       }
     };
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);
   }, []);
 
+  const renderNotConnectedContainer = () => (
+    <button
+      className="cta-button connect-wallet-button"
+      onClick={async () => {
+        const connectedPublicKey = await connectToPhantom();
+        setPublicKey(connectedPublicKey);
+      }}
+    >
+      {publicKey ?? "Connect to Wallet"}
+    </button>
+  );
+
   return (
     <div className="App">
-      <div className="container">
+      <div className={publicKey ? 'authed-container' : 'container'}>
         <div className="header-container">
           <p className="header">🖼 GIF Portal</p>
           <p className="sub-text">
             View your GIF collection in the metaverse ✨
           </p>
+          {!publicKey && renderNotConnectedContainer()}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
@@ -57,7 +79,7 @@ const App = () => {
             href={TWITTER_LINK}
             target="_blank"
             rel="noreferrer"
-          >{`built on @${TWITTER_HANDLE}`}</a>
+          >{`built by @${TWITTER_HANDLE}`}</a>
         </div>
       </div>
     </div>
