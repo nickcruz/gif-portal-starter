@@ -24,15 +24,18 @@ const main = async () => {
   console.log("👀 GIF Count", account.totalGifs.toString());
 
   // Call add_gif!
-  await program.rpc.addGif({
+  await program.rpc.addGif("https://www.reactiongifs.com/r/review.gif", {
     accounts: {
       baseAccount: baseAccount.publicKey,
+      user: provider.wallet.publicKey,
     },
   });
   console.log("Added GIF.");
 
   account = await program.account.baseAccount.fetch(baseAccount.publicKey);
   console.log("👀 GIF Count", account.totalGifs.toString());
+
+  console.log('👀 GIF List', account.gifList)
 
   console.log("📝 Your transaction signature", tx);
 };
