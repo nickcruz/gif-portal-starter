@@ -55,32 +55,10 @@ const renderNotConnectedContainer = (setPublicKey) => (
   </button>
 );
 
-const renderConnectedContainer = () => {
-  return (
-    <div className="connected-container">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-        }}
-      >
-        <input type="text" placeholder="Enter gif link!" />
-        <button type="submit" className="cta-button submit-gif-button">
-          Submit
-        </button>
-      </form>
-      <div className="gif-grid">
-        {TEST_GIFS.map((gif) => (
-          <div className="gif-item" key={gif}>
-            <img src={gif} alt={gif} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const App = () => {
   const [publicKey, setPublicKey] = useState(undefined);
+  const [inputValue, setInputValue] = useState("");
+  const [gifList, setGifList] = useState([]);
 
   useEffect(() => {
     const onLoad = async () => {
@@ -93,6 +71,63 @@ const App = () => {
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);
   }, []);
+
+  useEffect(() => {
+    if (publicKey) {
+      console.log("Fetching GIF list...");
+
+      // TODO: Call Solana program here.
+
+      // Set state
+      setGifList(TEST_GIFS);
+    }
+  }, [publicKey]);
+
+  const sendGif = () => {
+    if (inputValue.length > 0) {
+      console.log("Gif link:", inputValue);
+      const newList = gifList.slice();
+      newList.push(inputValue);
+      setGifList(newList);
+      setInputValue("");
+    } else {
+      console.log("Empty input. Try again.");
+    }
+  };
+
+  const renderConnectedContainer = () => {
+    console.log("gifList:", gifList);
+    return (
+      <div className="connected-container">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            sendGif();
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Enter gif link!"
+            value={inputValue}
+            onChange={(event) => {
+              const { value } = event.target;
+              setInputValue(value);
+            }}
+          />
+          <button type="submit" className="cta-button submit-gif-button">
+            Submit
+          </button>
+        </form>
+        <div className="gif-grid">
+          {gifList.map((gif) => (
+            <div className="gif-item" key={gif}>
+              <img src={gif} alt={gif} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="App">
