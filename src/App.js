@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { Program, Provider, web3 } from "@project-serum/anchor";
 
@@ -97,7 +97,7 @@ const App = () => {
     return provider;
   };
 
-  const getGifList = async () => {
+  const getGifList = useCallback(async () => {
     try {
       const provider = getProvider();
       const program = new Program(idl, programID, provider);
@@ -111,7 +111,7 @@ const App = () => {
       console.log("Error in getGifList: ", error);
       setGifList(undefined);
     }
-  };
+  }, []);
 
   const createGifAccount = async () => {
     try {
@@ -141,7 +141,7 @@ const App = () => {
       console.log("Fetching GIF list...");
       getGifList();
     }
-  }, [publicKey]);
+  }, [publicKey, getGifList]);
 
   const sendGif = async () => {
     if (inputValue.length > 0) {
