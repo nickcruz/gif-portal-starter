@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { Program, Provider, web3 } from "@project-serum/anchor";
-import kp from "./keypair.json";
 
 import idl from "./idl.json";
 import twitterLogo from "./assets/twitter-logo.svg";
@@ -10,7 +9,7 @@ import "./App.css";
 // SystemProgram is a reference to the Solana runtime!
 const { SystemProgram } = web3;
 
-const arr = Object.values(kp._keypair.secretKey);
+const arr = process.env.REACT_APP_BASE_ACCOUNT_SECRET_KEY.split(',').map(s => parseInt(s))
 const secret = new Uint8Array(arr);
 const baseAccount = web3.Keypair.fromSecretKey(secret);
 
@@ -24,13 +23,6 @@ const network = clusterApiUrl("devnet");
 const opts = {
   preflightCommitment: "processed",
 };
-
-const TEST_GIFS = [
-  "https://i.giphy.com/media/eIG0HfouRQJQr1wBzz/giphy.webp",
-  "https://media3.giphy.com/media/L71a8LW2UrKwPaWNYM/giphy.gif?cid=ecf05e47rr9qizx2msjucl1xyvuu47d7kf25tqt2lvo024uo&rid=giphy.gif&ct=g",
-  "https://media4.giphy.com/media/AeFmQjHMtEySooOc8K/giphy.gif?cid=ecf05e47qdzhdma2y3ugn32lkgi972z9mpfzocjj6z1ro4ec&rid=giphy.gif&ct=g",
-  "https://i.giphy.com/media/PAqjdPkJLDsmBRSYUp/giphy.webp",
-];
 
 // Constants
 const TWITTER_HANDLE = "nick___cruz";
